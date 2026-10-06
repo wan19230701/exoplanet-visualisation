@@ -243,10 +243,18 @@ def plot_pca(data: pd.DataFrame, out: Path) -> None:
     fig, ax = plt.subplots(figsize=(6.7, 6.3))
     angle = np.linspace(0, 2 * np.pi, 400)
     ax.plot(np.cos(angle), np.sin(angle), color="grey", lw=1, ls="--", alpha=0.45)
+    label_offsets = {
+        "log(P)": (22, 10), "log(a)": (-44, 14), "log(Teq)": (-34, -22),
+        "log(S)": (34, -22), "log(L*)": (-52, 18), "log(T*)": (-56, 2),
+        "log(R*)": (-52, -14), "log(Mp)": (-22, 18), "log(Rp)": (-44, -12),
+        "log(density)": (18, -18), "log(d)": (22, 16), "e": (0, 18),
+    }
     for index in shown:
         x, y = loadings[index]
         ax.arrow(0, 0, x, y, color="black", alpha=0.76, head_width=0.025, head_length=0.035, length_includes_head=True)
-        ax.annotate(features[index], (x, y), xytext=(8 if x >= 0 else -8, 8 if y >= 0 else -8), textcoords="offset points", ha="left" if x >= 0 else "right", va="bottom" if y >= 0 else "top", fontsize=8)
+        label = features[index]
+        offset = label_offsets.get(label, (12 if x >= 0 else -12, 12 if y >= 0 else -12))
+        ax.annotate(label, (x, y), xytext=offset, textcoords="offset points", ha="left" if offset[0] >= 0 else "right", va="bottom" if offset[1] >= 0 else "top", fontsize=8.8, bbox={"boxstyle": "round,pad=0.18", "facecolor": "white", "edgecolor": "none", "alpha": 0.86}, arrowprops={"arrowstyle": "-", "color": "grey", "lw": 0.6, "alpha": 0.65})
     ax.axhline(0, color="black", lw=0.8, alpha=0.35); ax.axvline(0, color="black", lw=0.8, alpha=0.35)
     ax.set(xlim=(-1.05, 1.05), ylim=(-1.05, 1.05), aspect="equal", xlabel=f"PC1 loading ({explained[0]:.1%} variance explained)", ylabel=f"PC2 loading ({explained[1]:.1%} variance explained)", title="PCA variable loadings")
     save(fig, out, "fig13_pca_loadings.png")
